@@ -23,9 +23,9 @@ parser.add_argument('--allow_neg_weight', default=False, type=bool)
 
 
 def softplus(x, limit=30):
-  if x > limit:
-    return x
-  return np.log(1.0 + np.exp(x))
+  x = np.array(x)
+  return np.where(x > np.ones_like(x) * limit,
+                  x, np.log(1.0 + np.exp(x)))
 
 
 def get_input_fn(tfrecord_filenames, batch_size):

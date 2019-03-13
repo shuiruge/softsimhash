@@ -8,11 +8,10 @@ def np_softplus(x, limit=30):
                   x, np.log(1.0 + np.exp(x)))
 
 
-def l2_log_regularize(weight, name='l2_log_regularize'):
+def std_log_regularize(weight, name='std_log_regularize'):
     """Notice that the (soft) simhash, as a linear algorithm, is sensitive to
-    the relative value between weight-components, like `w[i] / w[j]`, rather
-    than to the absolute magnitude, so we regularize the weight by its
-    logarithmic value. We thus say it's regularized by a "L2-log-distance".
+    the relative value between weight-components, like `w[i] / w[j]`, so we
+    regularize the weight by its logarithmic value.
 
     Args:
       weight: Tensor with shape `[n_features]` and float-dtype. All components
@@ -23,4 +22,5 @@ def l2_log_regularize(weight, name='l2_log_regularize'):
     """
     with tf.name_scope(name):
       # `1e-8` is for numerical stability
-      return tf.reduce_mean(tf.square(tf.log(weight + 1e-8)))
+      _, std = tf.nn.moments(tf.log(weight + 1e-8), axes=[0])
+      return std

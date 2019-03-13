@@ -23,6 +23,13 @@ class SoftSimhash:
   The standard discrete (hard) simhash is illustrated in the image:
     http://static.oschina.net/uploads/space/2013/0805/015507_uvv1_568818.jpg
 
+  Symmetry-breaking:
+    The standard (hard) simhash has re-scaling symmetry on weight. That is,
+    replacing `w[i] -> c w[i]` for a constant `c` and any index `i` will not
+    change the hard simhash value. However, this re-scaling does change the
+    value of soft simhash. Thus, the re-scaling symmetry on weight does not
+    hold for soft simhash.
+
   On negative weight:
     Weight of the simhash is generally positive, with magnigude reflecting
     the importance of the feature in the simhash process. However, if negative
@@ -32,7 +39,6 @@ class SoftSimhash:
     weighting with an additional operation of the hash-code, i.e. flipping,
     wherein the absolute value of the weight reflects the importance, while
     the sign for whether flipping the hash code or not.
-
 
   Shortcuts for shape:
     * batch_size -> B
@@ -93,15 +99,13 @@ class SoftSimhash:
       name: String.
 
     Returns:
-      A `tfd.Bernoulli` instance with batch-shape `[batch_size]` and
-      event-shape `[codelen]`.
+      A `SoftSimhash` instance.
     """
     # Check `n_features` consistancy
     n_features = weight.get_shape().as_list()[0]
     assert n_features == hash.get_shape().as_list()[1]
 
     with tf.name_scope(name):
-
       with tf.name_scope('signize_hash'):
         # The components of `signized_hash` are either `-1` or `1`
         hash = tf.cast(hash, weight.dtype)
